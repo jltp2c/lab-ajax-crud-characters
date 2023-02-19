@@ -8,6 +8,10 @@ const template = document.getElementById("template");
 const characterId = document.querySelector(".operation input");
 const characterIdDelete = document.querySelector(".delete input");
 const deleteBtn = document.getElementById("delete-one");
+const nameCreate = document.getElementById("nameCreate");
+const occupationCreate = document.getElementById("occupationCreate");
+const weaponCreate = document.getElementById("weaponCreate");
+const cartoonCreate = document.getElementById("cartoonCreate");
 
 const myUrl = "http://localhost:5005/api/characters/";
 
@@ -40,8 +44,28 @@ async function displayAll() {
   }
 }
 
+async function addCharacterToDatabase(event) {
+  event.preventDefault();
+  const name = nameCreate.value;
+  const occupation = occupationCreate.value;
+  const weapon = weaponCreate.value;
+
+  const characterCreate = {
+    name,
+    occupation,
+    weapon,
+  };
+
+  try {
+    const character = await axios.post("/characters", characterCreate);
+    createCharacter(character);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 document.getElementById("fetch-all").addEventListener("click", displayAll);
-// je ne trouve pas comment recuperer un nom via l'input puis filtrer avec son ID. Du coup la recherche se fait avec l'ID
+
 document
   .getElementById("fetch-one")
   .addEventListener("click", async function () {
@@ -67,29 +91,28 @@ document
     let idInput = characterIdDelete.value;
     try {
       const deleteCharacter = await axios.delete(myUrl + `${idInput}`);
-      console.log(deleteCharacter.status);
       deleteBtn.classList.remove("noWorks");
       deleteBtn.classList.add("active");
       setInterval(() => {
         deleteBtn.classList.remove("active");
-      }, 4000);
+      }, 3000);
       console.log(deleteCharacter, "has been deleted");
       displayAll();
     } catch (error) {
       deleteBtn.classList.add("noWorks");
       setInterval(() => {
         deleteBtn.classList.remove("noWorks");
-      }, 4000);
+      }, 2000);
       console.log(error);
     }
   });
 
 document
   .getElementById("edit-character-form")
-  .addEventListener("submit", function (event) {});
-
-document
-  .getElementById("new-character-form")
   .addEventListener("submit", function (event) {
     event.preventDefault();
   });
+
+document
+  .getElementById("new-character-form")
+  .addEventListener("submit", addCharacterToDatabase);

@@ -77,13 +77,18 @@ router.patch("/:id", async (req, res, next) => {
  */
 router.delete("/:id", async (req, res, next) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
+    const id = req.params.id;
+
+    const character = await Character.findOne({ _id: id });
+    if (!character) {
       return res.status(400).send("Invalid Character id");
     }
-    const oneCharacter = await Character.findByIdAndDelete(req.params.id);
+
+    const deletedCharacter = await Character.findByIdAndDelete(id);
 
     res.json({
-      message: `the character has been deleted`,
+      message: "Character deleted successfully",
+      deletedCharacter,
     });
   } catch (error) {
     next(error);
