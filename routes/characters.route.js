@@ -31,7 +31,7 @@ router.post("/", async (req, res, next) => {
       weapon: req.body.weapon,
     };
 
-    const createdCharacter = await Character.created(character);
+    const createdCharacter = await Character.create(character);
     res.status(200).json(createdCharacter);
   } catch (error) {
     next(error);
@@ -55,16 +55,16 @@ router.get("/:id", async (req, res, next) => {
  * ? the updated character
  */
 router.patch("/:id", async (req, res, next) => {
-  const { characterId } = req.params;
+  const id = req.params.id;
   const characterToUpdate = { ...req.body };
   try {
     if (!characterToUpdate) {
-      return res.json({ message: `Character ${characterId} not found` });
+      return res.json({ message: `Character not found` });
     } else {
-      await Character.findByIdAndUpdate(characterId, characterToUpdate, {
+      await Character.findByIdAndUpdate(id, characterToUpdate, {
         new: true,
       });
-      res.json({ message: `You're updating your character : ${characterId}` });
+      res.json({ message: `You're updating your character` });
     }
   } catch (error) {
     next(200);

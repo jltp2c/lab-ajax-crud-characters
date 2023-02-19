@@ -12,6 +12,13 @@ const nameCreate = document.getElementById("nameCreate");
 const occupationCreate = document.getElementById("occupationCreate");
 const weaponCreate = document.getElementById("weaponCreate");
 const cartoonCreate = document.getElementById("cartoonCreate");
+const btnSendData = document.getElementById("send-data");
+const editId = document.getElementById("editId");
+const editName = document.getElementById("editName");
+const editOccupation = document.getElementById("editOccupation");
+const editWeapon = document.getElementById("editWeapon");
+const editCartoon = document.getElementById("editCartoon");
+const btnUpdate = document.getElementById("send-data-update");
 
 const myUrl = "http://localhost:5005/api/characters/";
 
@@ -48,19 +55,66 @@ async function addCharacterToDatabase(event) {
   event.preventDefault();
   const name = nameCreate.value;
   const occupation = occupationCreate.value;
+  const cartoon = cartoonCreate.checked ? true : false;
   const weapon = weaponCreate.value;
-
   const characterCreate = {
     name,
     occupation,
+    cartoon,
+    weapon,
+  };
+  try {
+    //parce que sur le myUrl j'ai mis un / en plus
+    const character = await axios.post(
+      "http://localhost:5005/api/characters",
+      characterCreate
+    );
+    createCharacter(character);
+    btnSendData.classList.remove("noWorks");
+    btnSendData.classList.add("active");
+    setInterval(() => {
+      btnSendData.classList.remove("active");
+    }, 3000);
+    await displayAll();
+  } catch (err) {
+    btnSendData.classList.add("noWorks");
+    setInterval(() => {
+      btnSendData.classList.remove("noWorks");
+    }, 2000);
+    console.log(err);
+  }
+}
+
+async function updateCharacter(e) {
+  e.preventDefault();
+  const id = editId.value;
+  const name = editName.value;
+  const occupation = editOccupation.value;
+  const cartoon = editCartoon.checked ? true : false;
+  const weapon = editWeapon.value;
+  const characterEdit = {
+    id,
+    name,
+    occupation,
+    cartoon,
     weapon,
   };
 
   try {
-    const character = await axios.post("/characters", characterCreate);
-    createCharacter(character);
-  } catch (err) {
-    console.log(err);
+    const character = await axios.patch(myUrl + id, characterEdit);
+    console.log(character);
+    btnUpdate.classList.remove("noWorks");
+    btnUpdate.classList.add("active");
+    setInterval(() => {
+      btnUpdate.classList.remove("active");
+    }, 3000);
+    await displayAll();
+  } catch (error) {
+    btnUpdate.classList.add("noWorks");
+    setInterval(() => {
+      btnUpdate.classList.remove("noWorks");
+    }, 2000);
+    console.log(error);
   }
 }
 
@@ -109,9 +163,7 @@ document
 
 document
   .getElementById("edit-character-form")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
-  });
+  .addEventListener("submit", updateCharacter);
 
 document
   .getElementById("new-character-form")
